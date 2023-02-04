@@ -107,7 +107,7 @@ export default async function handler(req, res) {
     let th = localFontSize;
 
     while (tw < maxWidth) {
-      ctx.font = `${localFontSize}px ${fontFamily}, Noto Color Emoji, sans-serif`;
+      ctx.font = `${localFontSize}px ${fontFamily}, Noto Color Emoji, Inter, sans-serif`;
       const [calcW, calcH] = textWidth(line);
       tw = calcW;
       th = calcH;
@@ -123,7 +123,7 @@ export default async function handler(req, res) {
       text: line,
       height: th,
       width: tw,
-      font: `${localFontSize}px ${fontFamily}, Noto Color Emoji, sans-serif`,
+      font: `${localFontSize}px ${fontFamily}, Noto Color Emoji, Inter, sans-serif`,
       fontSize: localFontSize,
     })
   }
