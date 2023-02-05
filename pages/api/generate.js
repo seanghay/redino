@@ -3,8 +3,7 @@ import { nanoid } from 'nanoid';
 import path from 'node:path'
 import { createCanvas, GlobalFonts, loadImage } from '@napi-rs/canvas'
 import QRCode from 'qrcode';
-
-
+import { LogSnag } from 'logsnag';
 
 const minmax = (min, max) => min + Math.floor(Math.random() * (max - min));
 
@@ -54,6 +53,21 @@ async function drawBanner(canvas, ctx, content) {
 
 export default async function handler(req, res) {
   const { text, og } = JSON.parse(req.query.data) || {};
+
+  if (process.env.LOGSNAG_TOKEN && process.env.LOGSNAG_PROJECT) {
+    const logsnag = new LogSnag({
+      token: process.env.LOGSNAG_TOKEN,
+      project: process.env.LOGSNAG_PROJECT,
+    })
+
+    await logsnag.publish({
+      channel: "generate",
+      icon: "⚡️",
+      notify: false,
+      event: "User Generated",
+      description: text.join("."),
+    });
+  }
 
   const imageWidth = 1000;
   const imageHeight = og ? 525 : 1000;

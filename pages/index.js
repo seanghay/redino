@@ -45,15 +45,9 @@ export default function Home(props) {
     onGenerate()
   }, [])
 
-  const onLoad = (e) => {
-    setLoading(false)
-    console.log(e.target.src)
-  }
-
   const onImageLoaded = (e) => {
     setLoading(false);
   }
-
 
   return (
     <>
