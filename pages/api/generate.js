@@ -53,12 +53,15 @@ async function drawBanner(canvas, ctx, content) {
 }
 
 export default async function handler(req, res) {
-  const { text } = JSON.parse(req.query.data) || {};
-  const imageSize = 1000;
-  const imageUrl = `https://source.unsplash.com/random/${imageSize}x${imageSize}/?inspire,motivation,cat,landscape,work,failure,success,life&_id=${nanoid()}`;
+  const { text, og } = JSON.parse(req.query.data) || {};
+
+  const imageWidth = 1000;
+  const imageHeight = og ? 525 : 1000;
+
+  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,motivation,cat,landscape,work,failure,success,life&_id=${nanoid()}`;
   const image = await loadImage(imageUrl);
   const filename = nanoid() + ".jpg";
-  const canvas = createCanvas(imageSize, imageSize);
+  const canvas = createCanvas(imageWidth, imageHeight);
   const ctx = canvas.getContext('2d');
 
   ctx.lineCap = 'round';

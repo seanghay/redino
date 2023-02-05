@@ -1,16 +1,43 @@
 import Head from 'next/head'
+import { useRouter } from 'next/router.js';
 import { useCallback, useEffect, useState } from 'react'
 
-export default function Home() {
+export async function getServerSideProps(context) {
+  return {
+    props: {
+      data: context.query.data || "សួស្ដី\nមនុស្ស",
+    }
+  }
+}
+
+export default function Home(props) {
+  const router = useRouter();
   const [imageUrl, setImageUrl] = useState(null);
-  const [text, setText] = useState('ធ្វើរូបដើម្បីតែ\nគ្រួសារ\nទេបាទ');
+  const [text, setText] = useState(props.data);
   const [loading, setLoading] = useState(false);
+  const ogTitle = text.replace(/\n/g, ' ');
+
+  const ogImageData = {
+    og: 1,
+    text: text.split(/\n/),
+  }
+
+  const ogImage = `https://redino.vercel.app/api/generate?data=${encodeURIComponent(JSON.stringify(ogImageData))}`;
+  const ogUrl = "https://redino.vercel.app/?data=" + encodeURIComponent(props.data);
 
   const onGenerate = useCallback(() => {
     setImageUrl(null);
     setLoading(true)
+    
     const data = { text: text.split(/\n/) };
     setImageUrl(`/api/generate?data=${encodeURIComponent(JSON.stringify(data))}&t=${Date.now()}`)
+   
+    router.replace({
+      query: {
+        data: text,
+      }
+    })
+    
   })
 
   useEffect(() => {
@@ -29,10 +56,17 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Redino</title>
-        <meta name="description" content="Redino" />
+        <title>{ogTitle} / Redino</title>
+        <meta name="description" content={ogTitle} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta property="og:url" content={ogUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content="Redino" />
+        <meta property="og:image" content={ogImage} />
         <link rel="icon" href="/favicon.ico" />
+
       </Head>
       <main className='flex-column'>
         <h3>🦖 Redino Generator</h3>
