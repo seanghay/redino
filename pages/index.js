@@ -49,6 +49,8 @@ export default function Home() {
           </div>
           }
         </div>
+        <a href='https://github.com/seanghay/redino' target="_blank"><strong><small>View on GitHub</small></strong></a>
+
       </main>
     </>
   )
