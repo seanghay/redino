@@ -75,6 +75,7 @@ export default function Home(props) {
           {loading ? 'Loading…' : 'Generate'}
         </button>
         <div>
+          <small><strong>Shareable Link (Facebook, Twitter, Telegram)</strong></small>
           <div className='flex' style={{ gap: '8px' }}>
             <input style={{ color: "gray" }} readOnly value={computedOgUrl} placeholder='Shareable link' />
             <button onClick={() => copy(computedOgUrl)} className='button-outline'>Copy</button>
