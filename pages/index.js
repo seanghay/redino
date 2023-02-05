@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router.js';
 import { useCallback, useEffect, useState } from 'react'
-
+import copy from 'copy-to-clipboard';
 export async function getServerSideProps(context) {
   return {
     props: {
@@ -24,20 +24,21 @@ export default function Home(props) {
 
   const ogImage = `https://redino.vercel.app/api/generate?data=${encodeURIComponent(JSON.stringify(ogImageData))}`;
   const ogUrl = "https://redino.vercel.app/?data=" + encodeURIComponent(props.data);
+  const computedOgUrl = "https://redino.vercel.app/?data=" + encodeURIComponent(text);
 
   const onGenerate = useCallback(() => {
     setImageUrl(null);
     setLoading(true)
-    
+
     const data = { text: text.split(/\n/) };
     setImageUrl(`/api/generate?data=${encodeURIComponent(JSON.stringify(data))}&t=${Date.now()}`)
-   
+
     router.replace({
       query: {
         data: text,
       }
     })
-    
+
   })
 
   useEffect(() => {
@@ -59,7 +60,6 @@ export default function Home(props) {
         <title>{ogTitle} / Redino</title>
         <meta name="description" content={ogTitle} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-
         <meta property="og:url" content={ogUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={ogTitle} />
@@ -75,6 +75,10 @@ export default function Home(props) {
           {loading ? 'Loading…' : 'Generate'}
         </button>
         <div>
+          <div className='flex' style={{ gap: '8px' }}>
+            <input style={{ color: "gray" }} readOnly value={computedOgUrl} placeholder='Shareable link' />
+            <button onClick={() => copy(computedOgUrl)} className='button-outline'>Copy</button>
+          </div>
           {imageUrl && <div>
             <blockquote>ℹ️ Save the image by right clicking on it and do not open the image in new tab!</blockquote>
             <img
