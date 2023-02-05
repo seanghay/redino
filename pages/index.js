@@ -54,10 +54,13 @@ export default function Home(props) {
     setLoading(false);
   }
 
+
   return (
     <>
       <Head>
         <title>{ogTitle} / Redino</title>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={ogImage} />
         <meta name="description" content={ogTitle} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta property="og:url" content={ogUrl} />
