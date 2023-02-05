@@ -52,6 +52,7 @@ async function drawBanner(canvas, ctx, content) {
 }
 
 export default async function handler(req, res) {
+  
   const { text, og } = JSON.parse(req.query.data) || {};
 
   if (process.env.LOGSNAG_TOKEN && process.env.LOGSNAG_PROJECT) {
@@ -164,5 +165,6 @@ export default async function handler(req, res) {
   await drawBanner(canvas, ctx, 'https://redino.vercel.app/');
   res.setHeader("Content-Disposition", `inline; filename=${filename}`);
   res.setHeader("Content-Type", "image/jpeg");
+  res.setHeader('Cache-Control', 's-maxage=3600');
   res.send(canvas.toBuffer('image/jpeg', 80));
 }
