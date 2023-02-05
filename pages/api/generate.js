@@ -1,9 +1,10 @@
-import startCase from 'lodash/startCase.js';
 import sample from 'lodash/sample.js';
-import fg from 'fast-glob';
 import { nanoid } from 'nanoid';
 import path from 'node:path'
 import { createCanvas, GlobalFonts, loadImage } from '@napi-rs/canvas'
+import QRCode from 'qrcode';
+
+
 
 const minmax = (min, max) => min + Math.floor(Math.random() * (max - min));
 
@@ -26,7 +27,7 @@ GlobalFonts.loadFontsFromDir(path.join(process.cwd(), "fonts"));
 let logoImage = null
 
 async function drawLogo(ctx, canvas) {
-  
+
   if (logoImage == null) {
     logoImage = await loadImage(path.join(process.cwd(), 'assets', "redino.png"));
   }
@@ -35,7 +36,7 @@ async function drawLogo(ctx, canvas) {
   const m = 44;
   const w = s;
   const h = s / (logoImage.width / logoImage.height);
-  const position = Math.floor(Math.random() * 4);
+  const position = Math.floor(Math.random() * 2);
 
   // top left
   if (position == 0) {
@@ -43,20 +44,12 @@ async function drawLogo(ctx, canvas) {
     return;
   }
 
-  // top right
-  if (position == 1) {
-    ctx.drawImage(logoImage, canvas.width - m - w, m, w, h)
-    return;
-  }
+  ctx.drawImage(logoImage, canvas.width - m - w, m, w, h)
+}
 
-  // bottom left
-  if (position == 2) {
-    ctx.drawImage(logoImage, m, canvas.height - m - h, w, h);
-    return;
-  }
-
-  // bottom right
-  ctx.drawImage(logoImage, canvas.width - m - w, canvas.height - m - h, w, h)
+async function drawBanner(canvas, ctx, content) {
+  const qrcode = await loadImage(await QRCode.toBuffer(content, { width: 100, margin: 2 }));
+  ctx.drawImage(qrcode, canvas.width - qrcode.width - 20, canvas.height - qrcode.height - 20);
 }
 
 export default async function handler(req, res) {
@@ -79,10 +72,9 @@ export default async function handler(req, res) {
 
   // font
   const fontFamily = sample(families);
-
   const lines = text || [];
 
-  const lineHeight = 1 + (1 / 3);
+  const lineHeight = 1.35
   const textWidth = text => {
     const m = ctx.measureText(text);
     return [
@@ -147,11 +139,13 @@ export default async function handler(req, res) {
     }
 
     ctx.fillText(item.text, (canvas.width - item.width) / 2, offsetY);
-    offsetY += item.height * lineHeight;
+    offsetY += item.fontSize * lineHeight;
     drawPosition++;
+
   }
 
+  await drawBanner(canvas, ctx, 'https://redino.vercel.app/');
   res.setHeader("Content-Disposition", `inline; filename=${filename}`);
   res.setHeader("Content-Type", "image/jpeg");
-  res.send(canvas.toBuffer('image/jpeg', 95));
+  res.send(canvas.toBuffer('image/jpeg', 80));
 }

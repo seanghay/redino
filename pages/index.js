@@ -22,6 +22,9 @@ export default function Home() {
     console.log(e.target.src)
   }
 
+  const onImageLoaded = (e) => {
+    setLoading(false);
+  }
 
   return (
     <>
@@ -42,7 +45,7 @@ export default function Home() {
             <blockquote>ℹ️ Save the image by right clicking on it and do not open the image in new tab!</blockquote>
             <img
               onError={() => setLoading(false)}
-              onLoad={() => setLoading(false)}
+              onLoad={onImageLoaded}
               key={imageUrl}
               src={imageUrl}
               alt="" />
@@ -50,7 +53,6 @@ export default function Home() {
           }
         </div>
         <a href='https://github.com/seanghay/redino' target="_blank"><strong><small>View on GitHub</small></strong></a>
-
       </main>
     </>
   )
