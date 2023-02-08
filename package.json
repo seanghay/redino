@@ -13,6 +13,7 @@
     "@next/font": "13.1.6",
     "canvas-text-wrapper": "^0.10.2",
     "copy-to-clipboard": "^3.3.3",
+    "extract-colors": "^2.0.5",
     "fast-glob": "^3.2.12",
     "lodash": "^4.17.21",
     "logsnag": "^0.1.6",

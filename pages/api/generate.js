@@ -2,6 +2,7 @@ import sample from 'lodash/sample.js';
 import { nanoid } from 'nanoid';
 import path from 'node:path'
 import { createCanvas, GlobalFonts, loadImage } from '@napi-rs/canvas'
+import { extractColorsFromImageData } from 'extract-colors';
 
 const minmax = (min, max) => min + Math.floor(Math.random() * (max - min));
 
@@ -51,6 +52,7 @@ export default async function handler(req, res) {
   const imageHeight = og ? 525 : imageWidth;
   const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,sunset,motivation,failure,success`;
   const image = await loadImage(imageUrl);
+
   const filename = nanoid() + ".jpg";
   const canvas = createCanvas(imageWidth, imageHeight);
   const ctx = canvas.getContext('2d');
@@ -61,6 +63,8 @@ export default async function handler(req, res) {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(image, 0, 0);
+  const imageData = ctx.getImageData(0, 0, imageWidth, imageHeight);
+  const colors = extractColorsFromImageData(imageData)
 
   await drawLogo(ctx, canvas);
 
@@ -116,16 +120,26 @@ export default async function handler(req, res) {
   let offsetY = (canvas.height - totalHeight) / 2;
 
   let drawPosition = 0;
+
+  const highlightColor = sample([
+    ...colors,
+    { hex: "#ffcb02", lightness: 0, }
+  ]);
+
   for (const item of items) {
+    const isHighlightPosition = items.length > 1 && (drawPosition % 2 !== 0)
+    const strokeColor = (isHighlightPosition && highlightColor.lightness < 0.6) ? 'white' : 'black';
 
     ctx.font = item.font;
-    ctx.strokeStyle = 'black';
-    ctx.fillStyle = 'black';
+    ctx.strokeStyle = strokeColor;
+    ctx.fillStyle = strokeColor;
+
     ctx.lineWidth = 6 + Math.floor(item.fontSize / 10)
     ctx.strokeText(item.text, (canvas.width - item.width) / 2, offsetY);
 
-    if (items.length > 1 && (drawPosition % 2 !== 0)) {
-      ctx.fillStyle = sample(['#dae619', '#ffcb02']);
+
+    if (isHighlightPosition) {
+      ctx.fillStyle = highlightColor.hex;
     } else {
       ctx.fillStyle = '#fff';
     }
