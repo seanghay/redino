@@ -2,8 +2,6 @@ import sample from 'lodash/sample.js';
 import { nanoid } from 'nanoid';
 import path from 'node:path'
 import { createCanvas, GlobalFonts, loadImage } from '@napi-rs/canvas'
-import QRCode from 'qrcode';
-import { LogSnag } from 'logsnag';
 
 const minmax = (min, max) => min + Math.floor(Math.random() * (max - min));
 
@@ -46,34 +44,13 @@ async function drawLogo(ctx, canvas) {
   ctx.drawImage(logoImage, canvas.width - m - w, m, w, h)
 }
 
-async function drawBanner(canvas, ctx, content) {
-  const qrcode = await loadImage(await QRCode.toBuffer(content, { width: 100, margin: 2 }));
-  ctx.drawImage(qrcode, canvas.width - qrcode.width - 20, canvas.height - qrcode.height - 20);
-}
 
 export default async function handler(req, res) {
-  
-  const { text, og } = JSON.parse(req.query.data) || {};
-
-  if (process.env.LOGSNAG_TOKEN && process.env.LOGSNAG_PROJECT) {
-    const logsnag = new LogSnag({
-      token: process.env.LOGSNAG_TOKEN,
-      project: process.env.LOGSNAG_PROJECT,
-    })
-
-    await logsnag.publish({
-      channel: "generate",
-      icon: "⚡️",
-      notify: false,
-      event: "User Generated",
-      description: text.join("."),
-    });
-  }
-
+  const { text, og = true } = JSON.parse(req.query.data) || {};
   const imageWidth = 1000;
-  const imageHeight = og ? 525 : 1000;
+  const imageHeight = og ? 525 : imageWidth;
 
-  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,motivation,cat,landscape,work,failure,success,life&_id=${nanoid()}`;
+  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,motivation,landscape,work,failure,success,life&_id=${nanoid()}`;
   const image = await loadImage(imageUrl);
   const filename = nanoid() + ".jpg";
   const canvas = createCanvas(imageWidth, imageHeight);
@@ -92,7 +69,7 @@ export default async function handler(req, res) {
   const fontFamily = sample(families);
   const lines = text || [];
 
-  const lineHeight = 1.35
+  const lineHeight = og ? 1.1 : 1.2
   const textWidth = text => {
     const m = ctx.measureText(text);
     return [
@@ -102,12 +79,9 @@ export default async function handler(req, res) {
   }
 
   const maxWidth = canvas.width * (minmax(7, 9) / 10);
-
-  let totalHeight = 0;
-
   const items = [];
 
-  let maxFontSize = minmax(65, 120);
+  let maxFontSize = minmax(65, og ? 100 : 120);
 
   // layout
   for (const line of lines) {
@@ -127,8 +101,6 @@ export default async function handler(req, res) {
       }
     }
 
-    totalHeight += th * lineHeight;
-
     items.push({
       text: line,
       height: th,
@@ -137,6 +109,9 @@ export default async function handler(req, res) {
       fontSize: localFontSize,
     })
   }
+
+  const maxLineHeight = Math.max(...items.map(i => i.height))
+  const totalHeight = maxLineHeight * items.length
 
   // draw
   let offsetY = (canvas.height - totalHeight) / 2;
@@ -157,12 +132,11 @@ export default async function handler(req, res) {
     }
 
     ctx.fillText(item.text, (canvas.width - item.width) / 2, offsetY);
-    offsetY += item.fontSize * lineHeight;
+    offsetY += maxLineHeight * lineHeight;
     drawPosition++;
 
   }
 
-  await drawBanner(canvas, ctx, 'https://redino.vercel.app/');
   res.setHeader("Content-Disposition", `inline; filename=${filename}`);
   res.setHeader("Content-Type", "image/jpeg");
   res.setHeader('Cache-Control', 's-maxage=3600');
