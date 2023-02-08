@@ -46,7 +46,7 @@ async function drawLogo(ctx, canvas) {
 
 
 export default async function handler(req, res) {
-  const { text, og = true } = JSON.parse(req.query.data) || {};
+  const { text, og } = JSON.parse(req.query.data) || {};
   const imageWidth = 1000;
   const imageHeight = og ? 525 : imageWidth;
 
