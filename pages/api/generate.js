@@ -49,8 +49,7 @@ export default async function handler(req, res) {
   const { text, og } = JSON.parse(req.query.data) || {};
   const imageWidth = 1000;
   const imageHeight = og ? 525 : imageWidth;
-
-  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,motivation,landscape,work,failure,success,life&_id=${nanoid()}`;
+  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,sunset,motivation,failure,success`;
   const image = await loadImage(imageUrl);
   const filename = nanoid() + ".jpg";
   const canvas = createCanvas(imageWidth, imageHeight);
