@@ -2,12 +2,31 @@ import Head from 'next/head'
 import { useRouter } from 'next/router.js';
 import { useCallback, useEffect, useState } from 'react'
 import copy from 'copy-to-clipboard';
+
 export async function getServerSideProps(context) {
   return {
     props: {
       data: context.query.data || "សួស្ដី\nមនុស្ស",
     }
   }
+}
+
+function parseText(text) {
+
+  const topicRegex = /topic\:\s*(.+)/gmi;
+  let topicResult;
+  const topics = new Set();
+
+  while (topicResult = topicRegex.exec(text)) {
+    topicResult[1].split(',').forEach(topic => {
+      topics.add(topic.trim())
+    })
+  }
+
+  return {
+    text: text.replace(/topic\:\s*(.+)/gmi, '').trim().split(/\n/),
+    topic: [...topics].join(','),
+  };
 }
 
 export default function Home(props) {
@@ -18,8 +37,8 @@ export default function Home(props) {
   const ogTitle = text.replace(/\n/g, ' ');
 
   const ogImageData = {
+    ...parseText(text),
     og: 1,
-    text: text.split(/\n/),
   }
 
   const ogImage = `https://redino.vercel.app/api/generate?data=${encodeURIComponent(JSON.stringify(ogImageData))}`;
@@ -29,8 +48,8 @@ export default function Home(props) {
   const onGenerate = useCallback(() => {
     setImageUrl(null);
     setLoading(true)
-
-    const data = { text: text.split(/\n/) };
+    
+    const data = parseText(text);
     setImageUrl(`/api/generate?data=${encodeURIComponent(JSON.stringify(data))}&t=${Date.now()}`)
 
     router.replace({

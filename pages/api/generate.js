@@ -47,10 +47,13 @@ async function drawLogo(ctx, canvas) {
 
 
 export default async function handler(req, res) {
-  const { text, og } = JSON.parse(req.query.data) || {};
+  const { text, og, topic } = JSON.parse(req.query.data) || {};
   const imageWidth = 1000;
   const imageHeight = og ? 525 : imageWidth;
-  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?inspire,sunset,motivation,failure,success`;
+
+  const parsedTopic = typeof topic === 'string' ? topic : `inspire,sunset,motivation,failure,success`
+  const imageUrl = `https://source.unsplash.com/random/${imageWidth}x${imageHeight}/?${parsedTopic}`;
+
   const image = await loadImage(imageUrl);
 
   const filename = nanoid() + ".jpg";
