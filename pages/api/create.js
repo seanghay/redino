@@ -2,7 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import requestIp from 'request-ip';
 import { nanoid } from 'nanoid';
-import { createImage, createDefaultOptions } from '@/src/canvas.js'
+import { createDefaultOptions } from '@/src/canvas.js'
 
 const redis = Redis.fromEnv();
 

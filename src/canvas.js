@@ -6,7 +6,9 @@ import axios from 'axios'
 import isUrlHttp from 'is-url-http';
 import { families } from './fonts.js'
 
-GlobalFonts.loadFontsFromDir(path.join(process.cwd(), "fonts"));
+export function registerFonts() {
+  GlobalFonts.loadFontsFromDir(path.join(process.cwd(), "fonts"));
+}
 
 function drawImageFill(canvas, context, image) {
   const scale = Math.max(canvas.width / image.width, canvas.height / image.height);
@@ -89,6 +91,7 @@ export async function createDefaultOptions(options = {}) {
 }
 
 export async function createImage(options = {}, isOG = false) {
+  registerFonts();
   const fontFamily = options.font || sample(families);
 
   const imageSize = [1000, isOG ? 525 : 1000];
