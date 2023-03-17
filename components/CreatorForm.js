@@ -79,7 +79,7 @@ export default function CreatorForm({ id }) {
           </FormControl>
 
           <FormControl>
-            <FormLabel>ពាក្យគន្លឹះនៃរូបភាព(ជាជម្រើស)</FormLabel>
+            <FormLabel>ពាក្យគន្លឹះ</FormLabel>
             <Input
               value={keyword}
               onChange={e => setKeyword(e.target.value)}
@@ -122,7 +122,7 @@ export default function CreatorForm({ id }) {
         </ButtonGroup>
       </HStack>
       
-      <Card>
+      <Card variant="outline">
         <AspectRatio ratio={1}>
           {imageUrl ? <Image src={imageUrl} alt={text} /> : <ImagePlaceholder/>}
         </AspectRatio>
