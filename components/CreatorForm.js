@@ -70,7 +70,7 @@ export default function CreatorForm({ id }) {
             placeholder='សរសេរ Quote របស់អ្នកនៅទីនេះ' type='text' />
         </FormControl>
 
-        <Stack gap={2} direction="row">
+        <Stack gap={2} direction={{base: "column", lg: "row"}}>
           <FormControl>
             <FormLabel>ពុម្ពអក្សរ</FormLabel>
             <Select onChange={e => setFont(e.target.value)} value={font} focusBorderColor="primary.500" fontWeight="medium" placeholder='(ចៃដន្យ)'>
@@ -87,7 +87,7 @@ export default function CreatorForm({ id }) {
           </FormControl>
         </Stack>
 
-        <Stack gap={2} direction="row">
+        <Stack gap={2} direction={{base: "column", lg: "row"}}>
           <FormControl>
             <FormLabel>ទំហំពុម្ពអក្សរ ({maxFontSize}px)</FormLabel>
             <Slider min={70} max={120} colorScheme="primary" aria-label='slider-ex-1' value={maxFontSize} onChange={v => setMaxFontSize(v)}>
