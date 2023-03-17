@@ -6,10 +6,10 @@ import {
   SliderThumb, SliderTrack, Spacer, Stack, Text, Textarea,
   Box
 } from '@chakra-ui/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { AiOutlineCloudDownload, AiOutlineLink } from 'react-icons/ai'
 import { ImMagicWand } from 'react-icons/im'
-import NextLink from 'next/link.js'
+import copy from 'copy-to-clipboard';
 
 function ImagePlaceholder() {
   return <Box bg="blackAlpha.50">
@@ -21,7 +21,7 @@ function ImagePlaceholder() {
 
 
 export default function CreatorForm({ id }) {
-
+  const [isCopy, setCopy] = useState(false);
   const [text, setText] = useState("សរសេរតាម\nចិត្តរបស់អ្នក")
   const [keyword, setKeyword] = useState("")
   const [font, setFont] = useState("");
@@ -29,7 +29,16 @@ export default function CreatorForm({ id }) {
   const [maxWidthScale, setMaxWidthScale] = useState(80)
   const [loading, setLoading] = useState(false);
   const [imageId, setImageId] = useState(id)
-  const imageUrl = imageId ? `/api/image/${imageId}`: null;
+  const imageUrl = imageId ? `/api/image/${imageId}` : null;
+  
+  const copyLink = () => {
+    setCopy(true)
+    copy(`https://redino.lol/${imageId}`);
+
+    setTimeout(() => {
+      setCopy(false);
+    }, 1000)
+  }
 
   const generate = useCallback(async () => {
     setLoading(true);
@@ -54,6 +63,7 @@ export default function CreatorForm({ id }) {
     setLoading(false);
   });
 
+
   return (<>
     <Stack p={4}>
       <Stack gap={2}>
@@ -70,7 +80,7 @@ export default function CreatorForm({ id }) {
             placeholder='សរសេរ Quote របស់អ្នកនៅទីនេះ' type='text' />
         </FormControl>
 
-        <Stack gap={2} direction={{base: "column", lg: "row"}}>
+        <Stack gap={2} direction={{ base: "column", lg: "row" }}>
           <FormControl>
             <FormLabel>ពុម្ពអក្សរ</FormLabel>
             <Select onChange={e => setFont(e.target.value)} value={font} focusBorderColor="primary.500" fontWeight="medium" placeholder='(ចៃដន្យ)'>
@@ -87,7 +97,7 @@ export default function CreatorForm({ id }) {
           </FormControl>
         </Stack>
 
-        <Stack gap={2} direction={{base: "column", lg: "row"}}>
+        <Stack gap={2} direction={{ base: "column", lg: "row" }}>
           <FormControl>
             <FormLabel>ទំហំពុម្ពអក្សរ ({maxFontSize}px)</FormLabel>
             <Slider min={70} max={120} colorScheme="primary" aria-label='slider-ex-1' value={maxFontSize} onChange={v => setMaxFontSize(v)}>
@@ -115,19 +125,16 @@ export default function CreatorForm({ id }) {
       </Stack>
       <HStack py={2}>
         <Text fontWeight="bold" fontSize="2xl">លទ្ធផលរូបភាព</Text>
-        <Spacer></Spacer>
-        <ButtonGroup>
-          {imageId && <Button as={NextLink} href={`/${imageId}`} isDisabled={id || !imageId} variant="outline" size="sm" leftIcon={<AiOutlineLink fontSize="1.2em" />}>ចែករំលែក</Button>}
-          <Button isDisabled variant="outline" size="sm" leftIcon={<AiOutlineCloudDownload fontSize="1.2em" />}>ទាញយក</Button>
-        </ButtonGroup>
       </HStack>
-      
+
       <Card variant="outline">
         <AspectRatio ratio={1}>
-          {imageUrl ? <Image src={imageUrl} alt={text} /> : <ImagePlaceholder/>}
+          {imageUrl ? <Image src={imageUrl} alt={text} /> : <ImagePlaceholder />}
         </AspectRatio>
       </Card>
-
+      {imageId && <Button onClick={copyLink} isDisabled={isCopy || id || !imageId} variant="outline" leftIcon={<AiOutlineLink fontSize="1.2em" />}>
+        {isCopy ? "បានចំលងរួចរាល់" : "ចំលងតំណភ្ជាប់"}  
+      </Button>}
     </Stack>
   </>)
 }
